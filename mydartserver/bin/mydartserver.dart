@@ -50,6 +50,8 @@ final _router = shelf_router.Router()
     (request) => Response.ok(DateTime.now().toUtc().toIso8601String()),
   )
   ..get('/info.json', _infoHandler)
+  ..get('/sum/<a|[a-z]+>/<b|[a-z]+>', _charHandler)
+  ..get('/sum/<a|[0-9]+>/<b|[0-9]+>/<c|[0-9]+>', _judgeHandler)
   ..get('/sum/<a|[0-9]+>/<b|[0-9]+>', _sumHandler);
 
 Response _helloWorldHandler(Request request) => Response.ok('Hello, World!');
@@ -66,6 +68,29 @@ Response _sumHandler(Request request, String a, String b) {
   final bNum = int.parse(b);
   return Response.ok(
     _jsonEncode({'a': aNum, 'b': bNum, 'sum': aNum + bNum}),
+    headers: {
+      ..._jsonHeaders,
+      'Cache-Control': 'public, max-age=604800, immutable',
+    },
+  );
+}
+
+Response _judgeHandler(Request request, String a, String b, String c) {
+  final aNum = int.parse(a);
+  final bNum = int.parse(b);
+  final cNum = int.parse(c);
+  return Response.ok(
+    _jsonEncode({'a': a, 'b': b, 'c': c, 'Judge': aNum + bNum == cNum}),
+    headers: {
+      ..._jsonHeaders,
+      'Cache-Control': 'public, max-age=604800, immutable',
+    },
+  );
+}
+
+Response _charHandler(Request request, String a, String b) {
+  return Response.ok(
+    _jsonEncode({'a': a, 'b': b, 'sum': a + b}),
     headers: {
       ..._jsonHeaders,
       'Cache-Control': 'public, max-age=604800, immutable',
